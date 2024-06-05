@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import json
 
 from sklearn.metrics import pairwise_distances
 from selector.methods.distance import MaxMin
@@ -78,4 +79,34 @@ if matrix_file is not None:
             selector = MaxMin(lambda x: pairwise_distances(x, metric="euclidean"))
             selected_ids = selector.select(matrix, size=num_points, labels=labels)
 
+        # Convert selected indices to a list of integers
+        selected_ids = [int(i) for i in selected_ids]
+
+        # Save selected indices to session state
+        st.session_state['selected_ids'] = selected_ids
+
+    # Check if the selected indices are stored in the session state
+    if 'selected_ids' in st.session_state:
+        selected_ids = st.session_state['selected_ids']
         st.write("Selected indices:", selected_ids)
+
+        # export format
+        export_format = st.selectbox("Select export format", ["CSV", "JSON"])
+
+        if export_format == "CSV":
+            csv_data = pd.DataFrame(selected_ids, columns = ["Selected Indices"])
+            csv = csv_data.to_csv(index = False).encode('utf-8')
+            st.download_button(
+                label = "Download as CSV",
+                data = csv,
+                file_name = 'selected_indices.csv',
+                mime = 'text/csv',
+            )
+        elif export_format == "JSON":
+            json_data = json.dumps({"Selected Indices": selected_ids})
+            st.download_button(
+                label = "Download as JSON",
+                data = json_data,
+                file_name = 'selected_indices.json',
+                mime = 'application/json',
+            )
