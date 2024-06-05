@@ -39,7 +39,11 @@ st.sidebar.markdown(
 )
 
 # File uploader for feature matrix or distance matrix (required)
-matrix_file = st.file_uploader("Upload a feature matrix or distance matrix", type=["csv", "xlsx", "npz", "npy"])
+matrix_file = st.file_uploader("Upload a feature matrix or distance matrix", type=["csv", "xlsx", "npz", "npy"], key="matrix_file")
+
+# Clear selected indices if a new matrix file is uploaded
+if matrix_file is None:
+    st.session_state.pop("selected_ids", None)
 
 # Load data from matrix file
 if matrix_file is not None:
@@ -55,10 +59,10 @@ if matrix_file is not None:
     st.write("Matrix uploaded successfully!")
 
     # Input for number of points to select (required)
-    num_points = st.number_input("Number of points to select", min_value=1, step=1)
+    num_points = st.number_input("Number of points to select", min_value=1, step=1, key="num_points")
 
     # Input for cluster label list (optional)
-    label_file = st.file_uploader("Upload a cluster label list (optional)", type=["csv", "xlsx"])
+    label_file = st.file_uploader("Upload a cluster label list (optional)", type=["csv", "xlsx"], key="label_file")
     labels = None
     if label_file is not None:
         if label_file.name.endswith(".csv"):
@@ -85,28 +89,28 @@ if matrix_file is not None:
         # Save selected indices to session state
         st.session_state['selected_ids'] = selected_ids
 
-    # Check if the selected indices are stored in the session state
-    if 'selected_ids' in st.session_state:
-        selected_ids = st.session_state['selected_ids']
-        st.write("Selected indices:", selected_ids)
+# Check if the selected indices are stored in the session state
+if 'selected_ids' in st.session_state and matrix_file is not None:
+    selected_ids = st.session_state['selected_ids']
+    st.write("Selected indices:", selected_ids)
 
-        # export format
-        export_format = st.selectbox("Select export format", ["CSV", "JSON"])
+    # export format
+    export_format = st.selectbox("Select export format", ["CSV", "JSON"], key="export_format")
 
-        if export_format == "CSV":
-            csv_data = pd.DataFrame(selected_ids, columns = ["Selected Indices"])
-            csv = csv_data.to_csv(index = False).encode('utf-8')
-            st.download_button(
-                label = "Download as CSV",
-                data = csv,
-                file_name = 'selected_indices.csv',
-                mime = 'text/csv',
-            )
-        elif export_format == "JSON":
-            json_data = json.dumps({"Selected Indices": selected_ids})
-            st.download_button(
-                label = "Download as JSON",
-                data = json_data,
-                file_name = 'selected_indices.json',
-                mime = 'application/json',
-            )
+    if export_format == "CSV":
+        csv_data = pd.DataFrame(selected_ids, columns = ["Selected Indices"])
+        csv = csv_data.to_csv(index = False).encode('utf-8')
+        st.download_button(
+            label = "Download as CSV",
+            data = csv,
+            file_name = 'selected_indices.csv',
+            mime = 'text/csv',
+        )
+    elif export_format == "JSON":
+        json_data = json.dumps({"Selected Indices": selected_ids})
+        st.download_button(
+            label = "Download as JSON",
+            data = json_data,
+            file_name = 'selected_indices.json',
+            mime = 'application/json',
+        )
