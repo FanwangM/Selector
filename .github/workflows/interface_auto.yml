@@ -1,0 +1,53 @@
+name: Hugging Face Deployment
+
+# Trigger the workflow on push events to the 'deployment' branch
+on:
+  push:
+    branches:
+      - deployment
+
+jobs:
+  build-and-deploy:
+    # Run the job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the latest code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up Python environment with version 3.9
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    # Step 3: Install the required dependencies
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements_dev.txt
+
+    # Step 4: Build the Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t jackyzzz076/selector .
+
+    # Step 5: Log in to Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        # Use secrets to log in to Docker Hub
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Step 6: Push the Docker image to Docker Hub
+    - name: Push Docker image
+      run: |
+        docker push jackyzzz076/selector
+
+    # Step 7: Deploy the Docker image to Hugging Face
+    - name: Deploy to Hugging Face
+      run: |
+        hf_api=$(curl -X POST -H "Authorization: Bearer ${{ secrets.HUGGING_FACE_TOKEN }}" -F "file=@Dockerfile" https://api.huggingface.co/spaces/JackyZzZzZ/selector/deploy)
+        echo "Hugging Face deploy response: $hf_api"
