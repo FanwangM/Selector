@@ -34,7 +34,7 @@ jobs:
       with:
         # Use secrets to log in to Docker Hub
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # Step 5: Build and Push the Docker image to Docker Hub
     - name: Push Docker image
@@ -43,7 +43,7 @@ jobs:
         # Use the Docker image built in the previous step
         context: .
         push: true
-        tags: jackyzzz076/selector:latest, jackyzzz076/selector:${{ github.run_number }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/selector:latest
 
     # Step 6: Deploy the Docker image to Hugging Face
     - name: Deploy to Hugging Face
