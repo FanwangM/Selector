@@ -28,23 +28,24 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements_dev.txt
 
-    # Step 4: Build the Docker image
-    - name: Build Docker image
-      run: |
-        sudo docker build -t jackyzzz076/selector:latest .
-
-    # Step 5: Log in to Docker Hub
+    # Step 4: Log in to Docker Hub
     - name: Log in to Docker Hub
-      run: |
+      uses: docker/login-action@v2
+      with:
         # Use secrets to log in to Docker Hub
-        sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} docker.io
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # Step 6: Push the Docker image to Docker Hub
+    # Step 5: Build and Push the Docker image to Docker Hub
     - name: Push Docker image
-      run: |
-        sudo docker push jackyzzz076/selector:latest
+      uses: docker/build-push-action@v2
+      with:
+        # Use the Docker image built in the previous step
+        context: .
+        push: true
+        tags: jackyzzz076/selector:latest, jackyzzz076/selector:${{ github.run_number }}
 
-    # Step 7: Deploy the Docker image to Hugging Face
+    # Step 6: Deploy the Docker image to Hugging Face
     - name: Deploy to Hugging Face
       run: |
         hf_api=$(curl -X POST -H "Authorization: Bearer ${{ secrets.HUGGING_FACE_TOKEN }}" -F "file=@Dockerfile" https://api.huggingface.co/spaces/JackyZzZzZ/selector/deploy)
