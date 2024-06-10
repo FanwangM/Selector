@@ -44,3 +44,18 @@ jobs:
       run: |
         hf_api=$(curl -X POST -H "Authorization: Bearer ${{ secrets.HUGGING_FACE_TOKEN }}" -F "file=@Dockerfile" https://api.huggingface.co/spaces/JackyZzZzZ/selector/deploy)
         echo "Hugging Face deploy response: $hf_api"
+
+    # Step 7: Install Hugging Face CLI
+    - name: Install Hugging Face CLI
+      run: |
+        pip install -U "huggingface_hub[cli]"
+
+    # Step 8: Authenticate with Hugging Face
+    - name: Authenticate with Hugging Face
+      run: |
+        huggingface-cli login --token ${{ secrets.HUGGING_FACE_TOKEN }}
+
+    # Step 9: Push Docker image to Hugging Face Space
+    - name: Push to Hugging Face Space
+      run: |
+        huggingface-cli upload ./Dockerfile --repo-type=space --repo-id=JackyZzZzZ/selector
