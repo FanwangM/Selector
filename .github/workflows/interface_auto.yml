@@ -36,7 +36,7 @@ jobs:
     # Step 5: Push the Docker image to Docker Hub
     - name: Push Docker image
       run: |
-        docker login -u jackyzzz076 -p ${{ secrets.DOCKER_HUB_TOKEN }}
+        docker login -u jackyzzz076 -p ${{ secrets.DOCKERHUB_TOKEN }}
         docker push jackyzzz076/selector-deployment:latest
 
     # Step 6: Deploy the Docker image to Hugging Face
