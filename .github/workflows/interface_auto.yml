@@ -43,7 +43,7 @@ jobs:
         # Use the Docker image built in the previous step
         context: .
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/selector:latest, ${{ secrets.DOCKER_USERNAME }}/selector:${{ github.run_number }}
+        tags: jackyzzz076/selector:latest, jackyzzz076/selector:${{ github.run_number }}
 
     # Step 6: Deploy the Docker image to Hugging Face
     - name: Deploy to Hugging Face
