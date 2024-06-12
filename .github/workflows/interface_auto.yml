@@ -39,17 +39,9 @@ jobs:
         docker login -u jackyzzz076 -p ${{ secrets.DOCKERHUB_TOKEN }}
         docker push jackyzzz076/selector-deployment:latest
 
-    # Step 6: Install Hugging Face CLI
-    - name: Install Hugging Face CLI
+    # Step 6: Push the app to Hugging Face
+    - name: Push to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        pip install -U "huggingface_hub[cli]"
-
-    # Step 7: Authenticate with Hugging Face
-    - name: Authenticate with Hugging Face
-      run: |
-        huggingface-cli login --token ${{ secrets.HUGGING_FACE_TOKEN }}
-
-    # Step 8: Push Docker image to Hugging Face Space
-    - name: Push to Hugging Face Space
-      run: |
-        huggingface-cli upload ./Dockerfile --repo-type=space --repo-id=JackyZzZzZ/selector
+        git push https://JackyZzZzZ:$HF_TOKEN@huggingface.co/spaces/JackyZzZzZ/selector deployment
