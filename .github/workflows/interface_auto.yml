@@ -17,32 +17,38 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-        lfs: false
+        lfs: true
 
-    # Step 2: Set up Python environment with version 3.9
+    # Step 2: Set up Git LFS
+    - name: Set up Git LFS
+      run: |
+        git lfs install
+        git lfs pull
+
+    # Step 3: Set up Python environment with version 3.9
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
 
-    # Step 3: Install the required dependencies
+    # Step 4: Install the required dependencies
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
         pip install -r requirements_dev.txt
 
-    # Step 4: Build the Docker image to Docker Hub
+    # Step 5: Build the Docker image to Docker Hub
     - name: Build Docker image
       run: |
         docker build . -t jackyzzz076/selector-deployment:latest
 
-    # Step 5: Push the Docker image to Docker Hub
+    # Step 6: Push the Docker image to Docker Hub
     - name: Push Docker image
       run: |
         docker login -u jackyzzz076 -p ${{ secrets.DOCKERHUB_TOKEN }}
         docker push jackyzzz076/selector-deployment:latest
 
-    # Step 6: Push the app to Hugging Face
+    # Step 7: Push the app to Hugging Face
     - name: Push to Hugging Face
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
