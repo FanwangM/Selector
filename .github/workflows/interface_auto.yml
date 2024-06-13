@@ -1,4 +1,4 @@
-name: Hugging Face Deployment
+name: Deployment on DockerHub and Hugging Face
 
 # Trigger the workflow on push events to the 'deployment' branch
 on:
@@ -15,6 +15,9 @@ jobs:
     # Step 1: Check out the latest code from the repository
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        lfs: true
 
     # Step 2: Set up Python environment with version 3.9
     - name: Set up Python
@@ -44,4 +47,4 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        git push https://JackyZzZzZ:$HF_TOKEN@huggingface.co/spaces/JackyZzZzZ/selector deployment
+        git push https://JackyZzZzZ:$HF_TOKEN@huggingface.co/spaces/JackyZzZzZ/selector dev-branch
