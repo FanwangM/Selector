@@ -2,14 +2,21 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import json
+import os
 
 from sklearn.metrics import pairwise_distances
 from selector.methods.distance import MaxMin
 
+# Get the current directory path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the assets directory
+assets_dir = os.path.join(current_dir, "..", "assets")
+
 # Set page configuration
 st.set_page_config(
     page_title="MaxMin",
-    page_icon="assets/QC-Devs.png",
+    page_icon=os.path.join(assets_dir, "QC-Devs.png")
 )
 
 st.title("Brute Strength - MaxMin")

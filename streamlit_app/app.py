@@ -1,11 +1,19 @@
 import streamlit as st
+import os
 
+# Get the current directory path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the path to the assets directory
+assets_dir = os.path.join(current_dir, "assets")
+
+# Set page configuration
 st.set_page_config(
     page_title="QC-Selector",
-    page_icon="assets/QC-Devs.png",
+    page_icon=os.path.join(assets_dir, "QC-Devs.png"),
 )
 
-st.image("assets/selector_logo.png")
+st.image(os.path.join(assets_dir, "selector_logo.png"))
 
 st.write("# Welcome to QC-Selector! 👋")
 
