@@ -52,6 +52,10 @@ jobs:
     - name: Replace README for Hugging Face
       run: |
         mv README_hf.md README.md
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "qcdevs@gmail.com"
+        git add README.md
+        git commit -m "Replace README.md with README_hf.md for Hugging Face"
 
     # Step 8: Push the app to Hugging Face
     - name: Push to Hugging Face
