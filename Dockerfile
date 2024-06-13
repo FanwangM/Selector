@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements_dev.txt
 # Copy the rest of the application code
 COPY . .
 
+# Install the Selector package
+RUN python setup.py install
+
 # Expose the port the app runs on
 EXPOSE 8501
 
