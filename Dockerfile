@@ -22,4 +22,4 @@ RUN python setup.py install
 EXPOSE 8501
 
 # Command to run the app
-CMD ["streamlit", "run", "streamlit_app/app.py"]
+CMD ["streamlit", "run", "streamlit_app/app.py", "--server.enableXsrfProtection=false"]
