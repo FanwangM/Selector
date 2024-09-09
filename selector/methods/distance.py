@@ -507,8 +507,6 @@ class DISE(SelectionBase):
         """
         self.r0 = r0
         self.r = r0
-        if ref_index is not None and ref_index < 0:
-            raise ValueError(f"ref_index must be a non-negative integer, got {ref_index}.")
         self.ref_index = ref_index
         self.tol = tol
         self.n_iter = n_iter
@@ -553,36 +551,39 @@ class DISE(SelectionBase):
             distances = spatial.distance.squareform(self.fun_dist(x, **self.kwargs))
 
         # set up the ref_index as when is None
-        if self.ref_index is None:
-            self.ref_index = get_initial_selection(
-                x=None,
-                x_dist=distances,
-                ref_index=self.ref_index,
-                fun_dist=None,
-            )
-        # set up the ref_index for integer and list of integers
-        elif isinstance(self.ref_index, (int, list)):
-            self.ref_index = get_initial_selection(
-                x=x,
-                x_dist=distances,
-                ref_index=self.ref_index,
-                fun_dist=None,
-            )
-        # not supported ref_index
-        else:
-            raise ValueError(
-                "The provided reference indices are not supported in the current implementation."
-            )
+        # if self.ref_index is None:
+        #     self.ref_index = get_initial_selection(
+        #         x=None,
+        #         x_dist=distances,
+        #         ref_index=self.ref_index0,
+        #         fun_dist=None,
+        #     )
+        # # set up the ref_index for integer and list of integers
+        # elif isinstance(self.ref_index, (int, list)):
+        #     self.ref_index = get_initial_selection(
+        #         x=x,
+        #         x_dist=distances,
+        #         ref_index=self.ref_index0,
+        #         fun_dist=None,
+        #     )
+        # # not supported ref_index
+        # else:
+        #     raise ValueError(
+        #         "The provided reference indices are not supported in the current implementation."
+        #     )
+        ref_index_1 = self._get_initial_ref_index_dise(
+            x=x, x_dist=distances, ref_index_0=self.ref_index
+        )
 
         # # calculate distance of all samples from reference sample; distance is a (n_samples,) array
         # # this includes the distance of reference sample from itself, which is 0
         # distances = spatial.minkowski_distance(x[self.ref_index], x, p=self.p)
-        distances_ref = distances[self.ref_index[0], :]
+        distances_ref = distances[ref_index_1[0], :]
 
         # get sorted index of samples based on their distance from reference (closest to farthest)
         # the first index will be the ref_index which has distance of zero
         index_sorted = np.argsort(distances_ref)
-        assert index_sorted[0] == self.ref_index
+        assert index_sorted[0] == ref_index_1
         # construct KDTree for quick nearest-neighbor lookup
         kdtree = spatial.KDTree(x)
 
@@ -610,6 +611,33 @@ class DISE(SelectionBase):
                     bv[index] = 1
 
         return selected
+
+    @staticmethod
+    def _get_initial_ref_index_dise(x, x_dist, ref_index_0):
+        """Build up the intial reference index for DISE algorithm."""
+        # set up the ref_index as when is None
+        if ref_index_0 is None:
+            ref_index_1 = get_initial_selection(
+                x=None,
+                x_dist=x_dist,
+                ref_index=ref_index_0,
+                fun_dist=None,
+            )
+        # set up the ref_index for integer and list of integers
+        elif isinstance(ref_index_0, (int, list)):
+            ref_index_1 = get_initial_selection(
+                x=x,
+                x_dist=x_dist,
+                ref_index=ref_index_0,
+                fun_dist=None,
+            )
+        # not supported ref_index
+        else:
+            raise ValueError(
+                "The provided reference indices are not supported in the current implementation."
+            )
+
+        return ref_index_1
 
     def select_from_cluster(self, x, size, labels=None):
         """Return selected samples from a cluster based on directed sphere exclusion algorithm
